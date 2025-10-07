@@ -1,0 +1,10 @@
+export class List{
+    id?: string;
+    name?: string;
+    title?: string;
+    position?:string;
+    is_deleted?: boolean;
+    is_active?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}

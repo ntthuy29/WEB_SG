@@ -66,8 +66,13 @@ export const userRouter: IRouter = Router();
  *                       email: "bob@example.com"
  *                       createdAt: "2025-09-21T13:00:00.000Z"
  */
-userRouter.get('/', (_req, res) => {
-  res.json(ok(userService.list()));
+userRouter.get('/', async (_req, res) => {
+  try {
+    const users = await userService.list();
+    res.json(ok(users));
+  } catch (e: any) {
+    res.status(500).json(fail(e.message ?? 'Internal error'));
+  }
 });
 
 /**
@@ -100,11 +105,44 @@ userRouter.get('/', (_req, res) => {
  *       400:
  *         description: Validation error
  */
-userRouter.post('/', (req, res) => {
+userRouter.post('/', async (req, res) => {
   try {
-    const user = userService.create(req.body);
+    const user = await userService.create(req.body);
     res.status(201).json(ok(user));
   } catch (e: any) {
-    res.status(400).json(fail(e.message));
+  
+    const status = e?.name === 'ZodError' ? 400 : 500;
+    res.status(status).json(fail(e.message ?? 'Error'));
+  }
+});
+
+userRouter.post('/login', async (req, res) => {
+  try {
+    const user = await userService.login(req.body);
+    res.json(ok(user));
+  } catch (e: any) {
+    res.status(401).json(fail(e.message ?? 'Unauthorized'));
+  }
+});
+
+userRouter.post('/refresh', async (req, res) => {
+  try {
+    const { refresh } = req.body;
+    const out = await userService.refresh(refresh);
+    res.json(ok(out));
+  } catch (e: any) {
+    res.status(401).json(fail(e.message ?? 'Unauthorized'));
+  }
+});
+
+userRouter.post('/logout', async (req, res) => {
+  try {
+  
+    const userId = req.body.userId;
+    if (!userId) return res.status(400).json(fail('userId required'));
+    await userService.logout(userId);
+    res.json(ok({}));
+  } catch (e: any) {
+    res.status(500).json(fail(e.message ?? 'Error'));
   }
 });

@@ -13,4 +13,5 @@ const get = (key: string, fallback?: string) => {
 export const env = {
   NODE_ENV: get('NODE_ENV', 'development'),
   PORT: Number(get('PORT', '4000')),
+  DATABASE_URL: process.env.DATABASE_URL ?? process.env.MONGO_URL ?? null,
 };

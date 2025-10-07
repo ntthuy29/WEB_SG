@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Luôn đọc .env ở thư mục bạn chạy lệnh (root BE nếu bạn chạy "pnpm dev" trong BE)
+
 dotenv.config({ path: path.join(process.cwd(), '.env'), debug: true });
 
 const get = (key: string, fallback?: string) => {

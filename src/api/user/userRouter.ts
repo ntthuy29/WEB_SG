@@ -116,6 +116,28 @@ userRouter.post('/', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /users/login:
+ *   post:
+ *     tags: [Users]
+ *     summary: Login user and receive access + refresh tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Authenticated
+ *       401:
+ *         description: Invalid credentials
+ */
 userRouter.post('/login', async (req, res) => {
   try {
     const user = await userService.login(req.body);
@@ -125,6 +147,27 @@ userRouter.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /users/refresh:
+ *   post:
+ *     tags: [Users]
+ *     summary: Rotate refresh token and get new access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refresh]
+ *             properties:
+ *               refresh: { type: string }
+ *     responses:
+ *       200:
+ *         description: Tokens rotated
+ *       401:
+ *         description: Invalid refresh token
+ */
 userRouter.post('/refresh', async (req, res) => {
   try {
     const { refresh } = req.body;
@@ -135,9 +178,29 @@ userRouter.post('/refresh', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /users/logout:
+ *   post:
+ *     tags: [Users]
+ *     summary: Logout user (invalidate refresh token stored server-side)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [userId]
+ *             properties:
+ *               userId: { type: string }
+ *     responses:
+ *       200:
+ *         description: Logged out
+ *       400:
+ *         description: Missing userId
+ */
 userRouter.post('/logout', async (req, res) => {
   try {
-  
     const userId = req.body.userId;
     if (!userId) return res.status(400).json(fail('userId required'));
     await userService.logout(userId);
